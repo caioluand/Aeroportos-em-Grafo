@@ -2,13 +2,12 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "tad/matriz.h"
 #include "tad/meustipos.h"
+#include "tad/listar.h"
 
 I32 main () {
-    I8 nome [50];
-    I8 sigla [3];
-    I8 opcao_menu [10];
+    I8 nome[50], sigla[3], sigla2[3], opcao_menu[10];
+    I16 voo;
     boolean sair = false;
 
     while (1) {
@@ -30,26 +29,28 @@ I32 main () {
         if (opcao_menu[1] == '\n') {
             switch (opcao_menu[0]) {
                 case '1':
-                    printf("Digite o nome do aeroporto e sua sigla (Ex. 'Guarulhos GRU'): ");
-                    scanf("%s", nome);
+                    printf("Digite o nome do aeroporto (Ex. 'Guarulhos'): ");
+                    scanf("%s", &nome);
+                    printf("Digite a sigla do aeroporto (Ex. 'GRU'): ");
+                    scanf("%s", &sigla);
                     getchar();
                     // funcao
                     break;
                 case '2':
                     printf("Digite a sigla do voo (Ex. '123'): ");
-                    scanf("%s", sigla);
+                    scanf("%hd", &voo);
                     getchar();
                     // funcao
                     break;
                 case '3':
                     printf("Digite a sigla do aeroporto a ser removido (Ex. 'GRU'): ");
-                    scanf("%s", sigla);
+                    scanf("%s", &sigla);
                     getchar();
                     // funcao
                     break;
                 case '4':
                     printf("Digite a sigla do voo a ser removido (Ex. '123'): ");
-                    scanf("%s", sigla);
+                    scanf("%hd", &voo);
                     getchar();
                     // funcao
                     break;
@@ -65,9 +66,9 @@ I32 main () {
                     break;
                 case '7':
                     printf("Digite a sigla do voo de origem (Ex. 'GRU'): ");
-                    scanf("%s", sigla);
+                    scanf("%s", &sigla);
                     printf("Digite a sigla do voo de destino (Ex. 'SSA'): ");
-                    scanf("%s", nome);
+                    scanf("%s", &sigla2);
                     getchar();
                     // funcao
                     break;

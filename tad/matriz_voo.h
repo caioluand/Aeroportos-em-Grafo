@@ -1,8 +1,8 @@
-#ifndef MATRIZ_H
-#define MATRIZ_H
+#ifndef MATRIZ_VOO_H
+#define MATRIZ_VOO_H
 #include "meustipos.h"
 
-typedef void *valor;
+typedef I16 *voo;
 
 typedef struct {
     I8 tipico;
@@ -18,14 +18,15 @@ typedef struct Linha {
 
 typedef struct Coluna {
     I32 numero;
-    valor valor;
+    voo voo;
     struct Coluna *esquerda;
     struct Coluna *direita;
 } Coluna;
 
 boolean nova_matriz(Raiz *matriz, I8 tipico);
 boolean free_matriz(Raiz *matriz);
-boolean armazenar(Raiz *matriz, U16 num_linha, U16 num_coluna, valor valor);
-valor recuperar(Linha *linha, Coluna *coluna);
 
-#endif // MATRIZ_H
+boolean armazenar(Raiz *matriz, U16 num_linha, U16 num_coluna, voo voo);
+voo recuperar(Raiz *matriz, U16 num_linha, U16 num_coluna);
+
+#endif // MATRIZ_VOO_H
