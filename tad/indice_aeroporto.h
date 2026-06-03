@@ -10,18 +10,18 @@ typedef struct {
 
 typedef struct {
     Aeroporto **aeroporto;
-    U16 capacidade;
-    U16 quantidade;
+    I16 capacidade;
+    I16 quantidade;
 } IndiceAeroporto;
 
 
-IndiceAeroporto* criar_vetor(U16 capacidade);
+IndiceAeroporto* criar_vetor(I16 capacidade);
 boolean free_vetor(IndiceAeroporto *vetor);
-U16 recuperar_indice(IndiceAeroporto *vetor, I8 sigla[4]);
+I16 recuperar_indice(IndiceAeroporto *vetor, I8 sigla[4]);
 
 boolean inserir_no_vetor(IndiceAeroporto *vetor, I8 nome[50], I8 sigla[4]);
 boolean remover_do_vetor(IndiceAeroporto *vetor, I8 sigla[4]);
-Aeroporto recuperar_aeroporto(IndiceAeroporto *vetor, U16 indice);
+Aeroporto recuperar_aeroporto(IndiceAeroporto *vetor, I16 indice);
 
 
 #endif // INDICE_AEROPORTO_H
