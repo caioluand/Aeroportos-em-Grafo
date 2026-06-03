@@ -1,16 +1,18 @@
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include "indice_aeroporto.h"
 #include "meustipos.h"
 
 
-IndiceAeroporto* criar_vetor(I16 capacidade){
-    IndiceAeroporto *vetor_de_aeroportos = (IndiceAeroporto *) malloc(capacidade * sizeof(IndiceAeroporto));
-    if (vetor_de_aeroportos == NULL) return NULL;
+IndiceAeroporto* criar_vetor(U16 capacidade){
+    IndiceAeroporto *vetor_de_aeroportos = (IndiceAeroporto *) malloc(/*capacidade **/sizeof(IndiceAeroporto));
+    if (vetor_de_aeroportos == NULL) return NULL; //free(vetor_de_aeroportos);
 
     vetor_de_aeroportos->aeroporto = (Aeroporto **) malloc(capacidade * sizeof(Aeroporto*));
     if (vetor_de_aeroportos->aeroporto == NULL) return NULL;
 
-    for (I16 i = 0; i < capacidade; i++) vetor_de_aeroportos->aeroporto[i] = NULL;
+    for (U16 i = 0; i < capacidade; i++) vetor_de_aeroportos->aeroporto[i] = NULL;
 
     vetor_de_aeroportos->capacidade = capacidade;
     vetor_de_aeroportos->quantidade = 0;
@@ -18,10 +20,11 @@ IndiceAeroporto* criar_vetor(I16 capacidade){
     return vetor_de_aeroportos;
 }
 
+
 boolean free_vetor(IndiceAeroporto *vetor){
     if (vetor == NULL) return false;
 
-    for (I16 i = 0; i < vetor->capacidade; i++){
+    for (U16 i = 0; i < vetor->capacidade; i++){
         if (vetor->aeroporto[i] != NULL) {
             free(vetor->aeroporto[i]);
         }
@@ -33,34 +36,44 @@ boolean free_vetor(IndiceAeroporto *vetor){
     return true;
 }
 
-boolean inserir_no_vetor(IndiceAeroporto *vetor, I8 nome[50], I16 sigla){
-    if (vetor == NULL || vetor->capacidade >= vetor->quantidade) return false;
+
+boolean inserir_no_vetor(IndiceAeroporto *vetor, I8 nome[50], I8 sigla[4]){
+    if (vetor == NULL || vetor->quantidade >= vetor->capacidade) return false;
 
     Aeroporto *novo_aeroporto = (Aeroporto *) malloc(sizeof(Aeroporto));
     if (novo_aeroporto == NULL) return false;
 
     strcpy((char*)novo_aeroporto->nome, (char*)nome);
-    novo_aeroporto->sigla = sigla;
+    strcpy((char*)novo_aeroporto->sigla, (char*)sigla);
 
-    vetor->aeroporto[vetor->capacidade] = novo_aeroporto;
+    for(U16 i = 0; i < vetor->capacidade; i++){
+        if (vetor->aeroporto[i] == NULL){
+            vetor->aeroporto[i] = novo_aeroporto;
+            vetor->quantidade++;
+            return true;
+        }
+    }
 
-    vetor->capacidade++;
-
-    return true;
+    return false;
 }
 
-boolean remover_do_vetor(IndiceAeroporto *vetor, I16 sigla){
-    if (vetor == NULL|| vetor->quantidade == 0) return false;
 
-    for (I16 i = 0; i < vetor->quantidade; i++){
-        if (vetor->aeroporto[i]->sigla = sigla){
+boolean remover_do_vetor(IndiceAeroporto *vetor, I8 sigla[4]){
+    if (vetor == NULL || vetor->quantidade == 0) return false;
+
+    U16 elementos_encontrados = 0;
+
+    for (U16 i = 0; i < vetor->capacidade; i++){
+        if (elementos_encontrados == vetor->quantidade) break;
+
+        if (vetor->aeroporto[i] == NULL) continue;
+
+        elementos_encontrados++;
+
+        if (strcmp((char*)vetor->aeroporto[i]->sigla, (char*)sigla) == 0){
 
             free(vetor->aeroporto[i]);
-            while (i < vetor->quantidade - 1){
-                vetor->aeroporto[i] = vetor->aeroporto[i + 1];
-                i++;
-            }
-            vetor->aeroporto[vetor->quantidade - 1] = NULL;
+            vetor->aeroporto[i] = NULL;
             vetor->quantidade--;
 
             return true;
@@ -70,12 +83,35 @@ boolean remover_do_vetor(IndiceAeroporto *vetor, I16 sigla){
     return false;
 }
 
-Aeroporto recuperar(IndiceAeroporto *vetor, U16 indice) {
-    Aeroporto aeroporto_vazio = { .nome = "", .sigla = 0 };
 
-    if (vetor == NULL || indice >= vetor->quantidade || vetor->aeroporto[indice] == NULL) {
+Aeroporto recuperar_aeroporto(IndiceAeroporto *vetor, U16 indice) {
+    Aeroporto aeroporto_vazio = { .nome = "", .sigla = "" };
+
+    if (vetor == NULL || indice >= vetor->capacidade || vetor->aeroporto[indice] == NULL) {
         return aeroporto_vazio;
     }
 
     return *(vetor->aeroporto[indice]);
+}
+
+
+U16 recuperar_indice(IndiceAeroporto *vetor, I8 sigla[4]){
+    if (vetor == NULL || vetor->quantidade == 0) return 65535;
+
+    U16 elementos_encontrados = 0;
+
+    for(U16 i = 0; i < vetor->capacidade; i++){
+        if (elementos_encontrados == vetor->quantidade) break;
+
+        if (vetor->aeroporto[i] == NULL) continue;
+
+        elementos_encontrados++;
+
+        if (strcmp((char*)vetor->aeroporto[i]->sigla, (char*)sigla) == 0){
+            return i;
+        }
+    }
+
+
+    return 65535;
 }

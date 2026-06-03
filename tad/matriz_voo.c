@@ -3,10 +3,14 @@
 #include "meustipos.h"
 
 
-boolean nova_matriz(Raiz *matriz, I8 t) {
+Raiz* nova_matriz(I16 t) {
+    Raiz *matriz = (Raiz *) malloc(sizeof(Raiz));
+    if (matriz == NULL) return NULL;
+
     matriz->tipico = t;
     matriz->no_linha = NULL;
-    return true;
+    
+    return matriz;
 }
 
 
@@ -41,7 +45,7 @@ boolean free_matriz(Raiz *matriz) {
         }
 
 
-boolean armazenar(Raiz *matriz, U16 num_linha, U16 num_coluna, voo voo){
+boolean armazenar(Raiz *matriz, U16 num_linha, U16 num_coluna, I16 voo){
     if (matriz == NULL) return false;
 
     if (voo != matriz->tipico){
@@ -178,7 +182,7 @@ boolean armazenar(Raiz *matriz, U16 num_linha, U16 num_coluna, voo voo){
 
             return raiz;
         }
-        Linha* criar_linha_com_coluna(Linha *raiz, U16 num_linha, U16 num_coluna, voo voo, boolean *linha_ja_existe){
+        Linha* criar_linha_com_coluna(Linha *raiz, U16 num_linha, U16 num_coluna, I16 voo, boolean *linha_ja_existe){
             if (raiz == NULL) {
                 Linha *linha_nova = (Linha *)malloc(sizeof(Linha));
                 if (linha_nova == NULL) return NULL;
@@ -209,7 +213,7 @@ boolean armazenar(Raiz *matriz, U16 num_linha, U16 num_coluna, voo voo){
 
             return raiz;
         }
-        Coluna* criar_coluna(Coluna *raiz, U16 num_coluna, voo voo, boolean *coluna_ja_existe){
+        Coluna* criar_coluna(Coluna *raiz, U16 num_coluna, I16 voo, boolean *coluna_ja_existe){
             if (raiz == NULL) {
                 Coluna *coluna_nova = (Coluna *)malloc(sizeof(Coluna));
                 if (coluna_nova == NULL) return NULL;
@@ -235,7 +239,7 @@ boolean armazenar(Raiz *matriz, U16 num_linha, U16 num_coluna, voo voo){
         }
 
 
-voo recuperar(Raiz *matriz, U16 num_linha, U16 num_coluna) {
+I16 recuperar_voo(Raiz *matriz, U16 num_linha, U16 num_coluna) {
     if (matriz == NULL) return NULL;
 
     Linha *linha_atual = achar_no_linha(matriz->no_linha, num_linha);

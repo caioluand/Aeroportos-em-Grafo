@@ -6,7 +6,7 @@
 #include "tad/listar.h"
 
 I32 main () {
-    I8 nome[50], sigla[3], sigla2[3], opcao_menu[10];
+    I8 nome[50], sigla[4], sigla2[4], opcao_menu[10];
     I16 voo;
     boolean sair = false;
 

@@ -2,31 +2,32 @@
 #define MATRIZ_VOO_H
 #include "meustipos.h"
 
-typedef I16 *voo;
 
-typedef struct {
-    I8 tipico;
-    Linha *no_linha;
-} Raiz;
+typedef struct Coluna {
+    U16 numero;
+    I16 voo;
+    struct Coluna *esquerda;
+    struct Coluna *direita;
+} Coluna;
 
 typedef struct Linha {
-    I32 numero;
+    U16 numero;
     Coluna *no_coluna;
     struct Linha *esquerda;
     struct Linha *direita;
 } Linha;
 
-typedef struct Coluna {
-    I32 numero;
-    voo voo;
-    struct Coluna *esquerda;
-    struct Coluna *direita;
-} Coluna;
+typedef struct {
+    I16 tipico;
+    Linha *no_linha;
+} Raiz;
 
-boolean nova_matriz(Raiz *matriz, I8 tipico);
+
+Raiz* nova_matriz(I16 tipico);
 boolean free_matriz(Raiz *matriz);
 
-boolean armazenar(Raiz *matriz, U16 num_linha, U16 num_coluna, voo voo);
-voo recuperar(Raiz *matriz, U16 num_linha, U16 num_coluna);
+boolean armazenar(Raiz *matriz, U16 num_linha, U16 num_coluna, I16 voo);
+I16 recuperar_voo(Raiz *matriz, U16 num_linha, U16 num_coluna);
+
 
 #endif // MATRIZ_VOO_H
