@@ -69,7 +69,7 @@ boolean remover_aeroporto(Raiz *matriz, IndiceAeroporto *vetor, I8 sigla[4]) {
 boolean listar_voos(Raiz *matriz, IndiceAeroporto *vetor) {
 
     printf("\n+------------------------------------------------------------------------------------------+\n");
-    printf("| %-35s | %-10s | %-35s |\n", "Aeroporto Origem", "Voo", "Aeroporto Destino");
+    printf("| %-35s | %-10s | %-37s |\n", "Aeroporto Origem", "Voo", "Aeroporto Destino");
     printf("+------------------------------------------------------------------------------------------+\n");
 
     I16 voos_encontrados = 0;
@@ -93,7 +93,7 @@ boolean listar_voos(Raiz *matriz, IndiceAeroporto *vetor) {
                 sprintf(str_origem, "%s (%s)", origem.nome, origem.sigla);
                 sprintf(str_destino, "%s (%s)", destino.nome, destino.sigla);
 
-                printf("| %-35s | %03d        | %-35s |\n", str_origem, voo, str_destino);
+                printf("| %-35s | %03d        | %-37s |\n", str_origem, voo, str_destino);
             }
         }
     }
@@ -106,90 +106,80 @@ boolean listar_voos(Raiz *matriz, IndiceAeroporto *vetor) {
 }
 
 
+        void buscar_caminhos_dfs(Raiz *matriz, IndiceAeroporto *vetor, 
+                                I16 atual, I16 destino, 
+                                I16 *caminho, I16 passos, 
+                                boolean *visitados, boolean *encontrou) {
+            
+            caminho[passos] = atual;
+            visitados[atual] = true;
+
+            if (atual == destino) {
+                *encontrou = true;
+                
+                for (I16 i = 0; i < passos; i++) {
+                    Aeroporto orig = recuperar_aeroporto(vetor, caminho[i]);
+                    Aeroporto dest = recuperar_aeroporto(vetor, caminho[i + 1]);
+                    I16 voo = recuperar_voo(matriz, caminho[i], caminho[i + 1]);
+
+                    char str_origem[60], str_destino[60], str_voo[15];
+                    sprintf(str_origem, "%s (%s)", orig.nome, orig.sigla);
+                    sprintf(str_destino, "%s (%s)", dest.nome, dest.sigla);
+                    sprintf(str_voo, "%03d", voo);
+
+                    printf("| %-35s | %-10s | %-37s |\n", str_origem, str_voo, str_destino);
+                }
+                printf("+------------------------------------------------------------------------------------------+\n");
+            } else {
+                for (I16 proximo = 0; proximo < vetor->capacidade; proximo++) {
+                    if (!visitados[proximo]) {
+                        Aeroporto aero_prox = recuperar_aeroporto(vetor, proximo);
+                        if (aero_prox.sigla[0] == '\0') continue;
+
+                        I16 voo = recuperar_voo(matriz, atual, proximo);
+                        if (voo != matriz->tipico) {
+                            buscar_caminhos_dfs(matriz, vetor, proximo, destino, caminho, passos + 1, visitados, encontrou);
+                        }
+                    }
+                }
+            }
+
+            visitados[atual] = false;
+        }
 boolean listar_trajetos(Raiz *matriz, IndiceAeroporto *vetor, I8 sigla_origem[4], I8 sigla_destino[4]) {
     if (matriz == NULL || vetor == NULL) return false;
 
-    // 1. Descobrimos os índices da origem e do destino final
     I16 indice_origem = recuperar_indice(vetor, sigla_origem);
     I16 indice_destino = recuperar_indice(vetor, sigla_destino);
 
-    // 2. Se algum dos aeroportos não existir, encerra com erro
     if (indice_origem == -1 || indice_destino == -1) {
         printf("\n+------------------------------------------------------------------------------------------+\n");
-        printf("| %-35s | %-10s | %-35s |\n", "Aeroporto Origem", "Voo", "Aeroporto Destino");
+        printf("| %-35s | %-10s | %-37s |\n", "Aeroporto Origem", "Voo", "Aeroporto Destino");
         printf("+------------------------------------------------------------------------------------------+\n");
         printf("| %-88s |\n", "Erro: Aeroporto de origem ou destino nao encontrado no sistema.");
         printf("+------------------------------------------------------------------------------------------+\n");
         return false;
     }
 
-    // Cabeçalho da tabela padrão
     printf("\n+------------------------------------------------------------------------------------------+\n");
-    printf("| %-35s | %-10s | %-35s |\n", "Aeroporto Origem", "Voo", "Aeroporto Destino");
+    printf("| %-35s | %-10s | %-37s |\n", "Aeroporto Origem", "Voo", "Aeroporto Destino");
     printf("+------------------------------------------------------------------------------------------+\n");
 
-    // 3. Tenta primeiro encontrar um Voo Direto
-    I16 voo_direto = recuperar_voo(matriz, indice_origem, indice_destino);
-
-    if (voo_direto != matriz->tipico) {
-        // Se achou o voo direto, exibe e finaliza
-        Aeroporto orig = recuperar_aeroporto(vetor, indice_origem);
-        Aeroporto dest = recuperar_aeroporto(vetor, indice_destino);
-
-        char str_origem[60], str_destino[60];
-        sprintf(str_origem, "%s (%s)", orig.nome, orig.sigla);
-        sprintf(str_destino, "%s (%s)", dest.nome, dest.sigla);
-
-        printf("| %-35s | %03d | %-35s |\n", str_origem, voo_direto, str_destino);
-        printf("+------------------------------------------------------------------------------------------+\n\n");
-        return true;
-    }
-
-    // 4. Se não há voo direto, procura por uma Conexão/Escala Intermediária
+    boolean *visitados = (boolean *)calloc(vetor->capacidade, sizeof(boolean));
+    I16 *caminho = (I16 *)malloc(vetor->capacidade * sizeof(I16));
     boolean encontrou_trajeto = false;
 
-    for (I16 i = 0; i < vetor->capacidade; i++) {
-        // Pula se a posição do vetor estiver vazia ou se for igual à origem/destino
-        if (vetor->aeroporto[i] == NULL || i == indice_origem || i == indice_destino) {
-            continue;
-        }
+    buscar_caminhos_dfs(matriz, vetor, indice_origem, indice_destino, caminho, 0, visitados, &encontrou_trajeto);
 
-        // Verifica se existe o primeiro trecho: Origem -> Intermediário
-        I16 voo_trecho1 = recuperar_voo(matriz, indice_origem, i);
-        // Verifica se existe o segundo trecho: Intermediário -> Destino
-        I16 voo_trecho2 = recuperar_voo(matriz, i, indice_destino);
-
-        // Se ambos os voos existirem, encontramos a rota ideal!
-        if (voo_trecho1 != matriz->tipico && voo_trecho2 != matriz->tipico) {
-            
-            Aeroporto orig = recuperar_aeroporto(vetor, indice_origem);
-            Aeroporto inter = recuperar_aeroporto(vetor, i);
-            Aeroporto dest = recuperar_aeroporto(vetor, indice_destino);
-
-            char str_origem[60], str_inter[60], str_destino[60];
-            sprintf(str_origem, "%s (%s)", orig.nome, orig.sigla);
-            sprintf(str_inter, "%s (%s)", inter.nome, inter.sigla);
-            sprintf(str_destino, "%s (%s)", dest.nome, dest.sigla);
-
-            // Printa o primeiro trecho (GIG -> CNF)
-            printf("| %-35s | %03d | %-35s |\n", str_origem, voo_trecho1, str_inter);
-            printf("+------------------------------------------------------------------------------------------+\n");
-            
-            // Printa o segundo trecho (CNF -> SSA)
-            printf("| %-35s | %03d | %-35s |\n", str_inter, voo_trecho2, str_destino);
-            printf("+------------------------------------------------------------------------------------------+\n\n");
-
-            encontrou_trajeto = true;
-            break; // Para o loop assim que encontrar a primeira rota válida
-        }
-    }
-
-    // 5. Se varreu todo o vetor e não achou nem voo direto nem conexão
     if (!encontrou_trajeto) {
-        printf("| %-88s |\n", "Nenhum trajeto direto ou com 1 escala encontrado entre estes aeroportos.");
+        printf("| %-88s |\n", "Nenhum trajeto encontrado entre estes aeroportos.");
         printf("+------------------------------------------------------------------------------------------+\n");
     }
 
+    free(visitados);
+    free(caminho);
+
+    printf("\n"); 
     return true;
 }
 

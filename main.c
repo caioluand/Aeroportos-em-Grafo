@@ -16,7 +16,7 @@ I32 main () {
 
     while (1) {
 
-        printf("################################### Aeroportos em Grafos ###################################\n\n");
+        printf("\n################################### Aeroportos em Grafos ###################################\n\n");
 
         printf("[1] Cadastrar novo aeroporto\n");
         printf("[2] Cadastrar novo voo\n");
@@ -33,7 +33,7 @@ I32 main () {
         if (opcao_menu[1] == '\n') {
             switch (opcao_menu[0]) {
                 case '1':
-                    printf("Digite o nome do aeroporto (Ex. 'Guarulhos'): ");
+                    printf("Digite o nome da cidade do aeroporto (Ex. 'Guarulhos'): ");
                     scanf("%49[^\n]", nome);
                     printf("Digite a sigla do aeroporto (Ex. 'GRU'): ");
                     scanf("%3s", sigla);
@@ -43,10 +43,11 @@ I32 main () {
                 case '2':
                     printf("Digite a sigla do aeroporto de origem (Ex. 'GRU'): ");
                     scanf("%3s", sigla);
-                    printf("Digite a sigla do voo (Ex. '123'): ");
-                    scanf("%hd", &voo);
                     printf("Digite a sigla do aeroporto de destino (Ex. 'GRU'): ");
                     scanf("%3s", sigla2);
+                    printf("Digite a sigla do voo (Ex. '123'): ");
+                    scanf("%hd", &voo);
+
                     getchar();
 
                     I16 orig = recuperar_indice(vetor, sigla);
